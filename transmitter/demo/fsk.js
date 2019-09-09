@@ -24,7 +24,7 @@ function f(n) {
 
 var low = 880;
 var high = 440;
-var interval = 50;
+var interval = 200;
 
 var v = false;
 
