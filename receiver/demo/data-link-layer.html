@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <title>Audio Network - data transmission over sound waves</title>
+
+    <meta name="description" content="">
+
+    <link rel="stylesheet" type="text/css" href="data-link-layer.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body onLoad="init()">
+
+    <div class="wrapper">
+
+        <div class="container">
+            <h1>Audio Network - send data over sound in JavaScript</h1>
+            <div class="row margin-bottom">
+                <div class="col col-xs-12">
+                    <p class="text-right">
+                        Return to <a href="https://audio-network.rypula.pl">main page</a>
+                    </p>
+                    <p class="larger text-center">
+                        THIS PROJECT IS STILL UNDER DEVELOPMENT<br/>
+                        Source code available at <a href="https://github.com/robertrypula/AudioNetwork" target="_blank">GitHub</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ---------------- -->
+
+            <div class="row margin-bottom">
+                <div class="col col-xs-12">
+
+                    <div class="row margin-bottom-double">
+                        <div class="col col-xs-4 col-sm-5 col-md-3">
+                            <label>
+                                Loopback
+                            </label>
+                        </div>
+                        <div class="col col-xs-8 col-sm-7 col-md-9">
+                            <div class="clearfix margin-bottom" id="loopback-container">
+                                <button id="loopback-enabled" class="btn btn-default" onClick="onSetLoopbackClick(true)">Enabled</button>
+                                <button id="loopback-disabled" class="btn btn-default" onClick="onSetLoopbackClick(false)">Disabled</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ----- -->
+
+                    <h2>Synchronization</h2>
+
+                    <div class="row margin-bottom-double">
+                        <div class="col col-xs-4 col-sm-5 col-md-3">
+                            <label>
+                                RxSampleRate
+                            </label>
+                        </div>
+                        <div class="col col-xs-8 col-sm-7 col-md-9">
+                            <div class="label-box">
+                                <span>
+                                    <span id="rx-sample-rate">-</span> kHz
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row margin-bottom-double">
+                        <div class="col col-xs-4 col-sm-5 col-md-3">
+                            <label>
+                                RxSyncStatus
+                            </label>
+                        </div>
+                        <div class="col col-xs-8 col-sm-7 col-md-9">
+                            <div class="label-box">
+                                <span>
+                                    <span id="rx-sync-status"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row margin-bottom-double">
+                        <div class="col col-xs-12">
+                            <hr/>
+                        </div>
+                    </div>
+
+                    <div class="row margin-bottom-double">
+                        <div class="col col-xs-4 col-sm-5 col-md-3">
+                            <label>
+                                TxSampleRate
+                            </label>
+                        </div>
+                        <div class="col col-xs-8 col-sm-7 col-md-9">
+                            <div class="clearfix margin-bottom" id="tx-sample-rate-container">
+                                <button id="tx-sample-rate-44100" class="btn btn-default" onClick="onSetTxSampleRateClick(44100)">44.1 kHz</button>
+                                <button id="tx-sample-rate-48000" class="btn btn-default" onClick="onSetTxSampleRateClick(48000)">48.0 kHz</button>
+                            </div>
+                            <div class="margin-bottom">
+                                <button class="btn btn-default" onClick="onTxTwoWaySyncClick()">TxTwoWaySync</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- --- -->
+
+                    <h2>Data Link Layer frames</h2>
+
+                    <div class="row margin-bottom-double">
+                        <div class="col" id="io-traffic"></div>
+                    </div>
+
+                    <div class="row margin-bottom-double">
+                        <div class="col">
+                            <div class="margin-bottom">
+                                <div class="margin-bottom">
+                                    <textarea id="tx-textarea"></textarea>
+                                </div>
+                                <button
+                                    class="btn btn-default"
+                                    onClick="onTxClick()">
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ---------------- -->
+
+        </div>
+
+        <footer>
+            <div class="row">
+                <div class="col col-xs-12">
+                    <div class="copyright">Robert Rypuła 2015-2018</div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="../../js/audio-network-v1.3.2.js"></script>
+    <script src="../../js/convert-util.js"></script>
+    <script src="../../js/dom-util.js"></script>
+    <script src="../../js/io-traffic.js"></script>
+    <script src="data-link-layer.js"></script>
+</body>
+</html>
