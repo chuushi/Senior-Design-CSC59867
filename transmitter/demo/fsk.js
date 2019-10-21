@@ -1,61 +1,158 @@
-(function(){
-"use strict";
+// Copyright (c) 2015-2018 Robert Rypuła - https://audio-network.rypula.pl
+'use strict';
 
-var context, o, g;
+var PhysicalLayerBuilder = AudioNetwork.Rewrite.PhysicalLayer.PhysicalLayerBuilder;
 
-function run() {
-    context = new AudioContext();
-    o = context.createOscillator();
-    g = context.createGain();
-    o.connect(g);
-    g.connect(context.destination);
-    o.start(0);
+var
+    PROGRESS_BAR_FULL = 1,
+    MAX_VALUE_IN_BYTE = 255,
+    physicalLayerBuilder,
+    physicalLayer,
+    ioTraffic,
+    txSymbolLastRenderedId = 0;
+
+function init() {
+    physicalLayerBuilder = new PhysicalLayerBuilder();
+    physicalLayer = physicalLayerBuilder
+        .rxSyncStatusListener(rxSyncStatusListener)
+        .rxDspConfigListener(rxDspConfigListener)
+        .txDspConfigListener(txDspConfigListener)
+        .dspConfigListener(dspConfigListener)
+        .rxSymbolListener(rxSymbolListener)
+        .txSymbolProgressListener(txSymbolProgressListener)
+        .build();
+
+    ioTraffic = new IoTraffic(document.getElementById('io-traffic'));
+    invokeOnEnter('#tx-textarea', onTxClick);
 }
 
-function stop() {
-    o.stop();
-    //g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.0001)
+// ----------------------------------
+
+function getTxByteFromTxFskSymbol(txFskSymbol) {
+    return txFskSymbol - physicalLayer.getTxDspConfig().txSymbolMin;
 }
 
-function f(n) {
-    o.frequency.value = n;
-    return o.frequency;
+function getTxFskSymbolFromTxByte(txByte) {
+    return physicalLayer.getTxDspConfig().txSymbolMin + txByte;
 }
 
+function getRxByteFromRxFskSymbol(rxSymbol) {
+    return rxSymbol - physicalLayer.getRxDspConfig().rxSymbolMin;
+}
+
+<<<<<<< Updated upstream
 var low = 880;
 var high = 440;
 var interval = 50;
+=======
+// ----------------------------------
+>>>>>>> Stashed changes
 
-var v = false;
+function dspConfigListener(state) {
+    setActive(
+        '#loopback-container',
+        '#loopback-' + (state.isLoopbackEnabled ? 'enabled' : 'disabled')
+    );
+}
 
-function send(n) {
-    if (!v) {
-        run();
-        v = true;
+function rxDspConfigListener(state) {
+    html('#rx-sample-rate', (state.rxSampleRate / 1000).toFixed(1));
+}
+
+function rxSyncStatusListener(state) {
+    html(
+        '#rx-sync-status',
+        (state.isRxSyncOk ? 'OK' : 'waiting...') +
+        (state.isRxSyncInProgress ? ' [sync]' : '')
+    );
+}
+
+function txDspConfigListener(state) {
+    setActive('#tx-sample-rate-container', '#tx-sample-rate-' + state.txSampleRate);
+}
+
+// ----------------------------------
+
+function txSymbolProgressListener(data) {
+    var
+        txSymbolNotYetRendered,
+        txSymbolQueueItem,
+        isSpecialSymbol,
+        id,
+        i;
+
+    for (i = 0; i < data.txSymbolQueue.length; i++) {
+        txSymbolQueueItem = data.txSymbolQueue[i];
+        isSpecialSymbol =
+            txSymbolQueueItem.txSymbolType !== 'TX_SYMBOL_FSK' ||
+            getTxByteFromTxFskSymbol(txSymbolQueueItem.txFskSymbol) > MAX_VALUE_IN_BYTE;
+
+        if (isSpecialSymbol) {
+            continue;
+        }
+
+        id = txSymbolQueueItem.id;
+        txSymbolNotYetRendered = id > txSymbolLastRenderedId;
+        if (txSymbolNotYetRendered) {
+            ioTraffic.addTxItem('tx-' + id, getTxSymbolHtml(txSymbolQueueItem));
+            txSymbolLastRenderedId = id;
+        }
     }
 
-    var s = n & 1;
-    
-    if (s) {
-        f(high);
-    } else {
-        f(low);
-    }
+    ioTraffic.updateProgressBar('tx-' + data.txSymbolCurrent.id, PROGRESS_BAR_FULL);
+    ioTraffic.addClass('tx-' + data.txSymbol.id, 'io-traffic-success');
+}
 
-    var nn = n >> 1;
-    if (nn == 0) {
-        setTimeout(stop, interval);
-        v = false;
+function getTxSymbolHtml(txSymbolQueueItem) {
+    var txByte, txChar;
+
+    txByte = getTxByteFromTxFskSymbol(txSymbolQueueItem.txFskSymbol);
+    txChar = getAsciiFromByte(txByte);
+
+    return txChar === ' ' ? '&nbsp;' : txChar;
+}
+
+function rxSymbolListener(state) {
+    var rxByte, rxChar;
+
+    if (state.rxSymbol === null) {
         return;
     }
-    
-    setTimeout(send, interval, nn);
+
+    rxByte = getRxByteFromRxFskSymbol(state.rxSymbol);
+    rxChar = getAsciiFromByte(rxByte);
+    ioTraffic.addRxItem('rx-' + state.id, rxChar);
+    ioTraffic.addClass('rx-' + state.id, 'io-traffic-success');
+    ioTraffic.updateProgressBar('rx-' + state.id, PROGRESS_BAR_FULL);
 }
 
-document.getElementById("instart").onclick = function() {
-    var n = document.getElementById("inval").value;
-    send(n);  
+// ----------------------------------
+
+function onSetLoopbackClick(state) {
+    physicalLayer.setLoopback(state);
 }
 
+function onSetTxSampleRateClick(txSampleRate) {
+    physicalLayer.setTxSampleRate(txSampleRate);
+}
 
-}())
+function onTxSyncClick() {
+    physicalLayer.txSync();
+}
+
+function onTxClick() {
+    var
+        text = getFormFieldValue('#tx-textarea'),
+        byteList = getByteListFromAsciiString(text),
+        txFskSymbol,
+        txByte,
+        i;
+
+    for (i = 0; i < byteList.length; i++) {
+        txByte = byteList[i];
+        txFskSymbol = getTxFskSymbolFromTxByte(txByte);
+        physicalLayer.txSymbol(txFskSymbol);
+    }
+    setValue('#tx-textarea', '');
+    ioTraffic.forceNewRow();
+}

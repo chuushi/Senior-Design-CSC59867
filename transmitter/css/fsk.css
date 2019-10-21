@@ -1,0 +1,12 @@
+#tx-symbol-field {
+    width: 50px;
+}
+
+.log-container {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.rx-item-content, .tx-item-content {
+    font-family: monospace;
+}
