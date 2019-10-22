@@ -1,0 +1,20 @@
+{
+  "name": "rc-receiver",
+  "version": "1.0.0",
+  "description": "Senior Project for CSC 59867",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rc"
+  ],
+  "author": "team1",
+  "license": "ISC",
+  "dependencies": {
+    "airsocket": "0.0.7",
+    "audio-context": "^1.0.3",
+    "audio-network": "^1.3.2",
+    "getusermedia": "^2.0.1"
+  }
+}
