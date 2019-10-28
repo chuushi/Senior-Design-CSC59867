@@ -16,6 +16,7 @@
     "audio-context": "^1.0.3",
     "audio-network": "^1.3.2",
     "getusermedia": "^2.0.1",
+    "js-polyfills": "^0.1.42",
     "mic": "^2.1.2"
   }
 }

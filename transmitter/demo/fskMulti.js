@@ -1,6 +1,10 @@
 (function(){
 "use strict";
 
+// ===== CONFIG ===== //
+var freqs = [22000, 18000, 8000, 400];
+// ===== CONFIG ===== //
+
 var context, o, g;
 
 function run() {
@@ -24,7 +28,7 @@ function f(n) {
 
 var high = 8000;
 var low = 9000;
-var interval = 200;
+var interval = 500;
 
 var v = false;
 
@@ -52,44 +56,32 @@ function send(n) {
     setTimeout(send, interval, nn);
 }
 
-document.getElementById("instart").onclick = function() {
-    var n = document.getElementById("inval").value;
-    send(n);  
-}
+var domButtons = document.getElementById("buttons");
 
-var highToggle = false;
-var lowToggle = false;
-
-document.getElementById("high").onclick = function() {
-    lowToggle = false;
-    if (highToggle) {
-        highToggle = false;
-        stop();
-        v = false;
-        return;
+var hit = -1;
+for (var i = 0; i < freqs.length; i++) {
+    var e = document.createElement("input");
+    e.setAttribute("type", "button");
+    e.value = "Play " + freqs[i];
+    e.dataset.index = i;
+    
+    e.onclick = function() {
+        var j = this.dataset.index;
+        if (hit == j) {
+            hit = -1;
+            stop();
+            v = false;
+            return;
+        }
+        if (!v) {
+            run();
+            v = true;
+        }
+        hit = j;
+        f(freqs[j]);
     }
-    if (!v) {
-        run();
-        v = true;
-    }
-    highToggle = true;
-    f(high);
-}
-
-document.getElementById("low").onclick = function() {
-    highToggle = false;
-    if (lowToggle) {
-        lowToggle = false;
-        stop();
-        v = false;
-        return;
-    }
-    if (!v) {
-        run();
-        v = true;
-    }
-    lowToggle = true;
-    f(low);
+    
+    domButtons.appendChild(e);    
 }
 
 }())
