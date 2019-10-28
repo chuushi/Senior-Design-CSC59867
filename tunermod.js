@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 
-const { FrequencyTable, createMic, bufferToFreq } = require('my-tuner');
+// const { FrequencyTable, createMic, bufferToFreq } = require('my-tuner');
 const Goertzel = require('goertzeljs');
 const Mic = require('mic');
 
-const ft = new FrequencyTable(3, 5);
+// const ft = new FrequencyTable(3, 5);
 
+// ===== CONFIGS ===== //
 const rate = 41000;
+const mark = 8000;
+const markSig = 3;
+const space = 9000;
+const spaceSig = 3;
 
-const mark = 4400;
-const space = 5000;
+// ===== END CONFIGS ===== //
 
 const mic = Mic({
   rate: rate,
@@ -31,41 +35,46 @@ stream.on('error', e => {
 });
 
 
+var mStr = mark.toString(),
+    sStr = space.toString();
 let count = 0;
+    type = 0;
+
 stream.on('data', b => {
-  const hz = bufferToFreq(rate, b);
-  console.log(hz);
+//  const hz = bufferToFreq(rate, b);
+//  console.log(hz);
 
   goertzel.refresh();
-
   const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
-
   wf.forEach(function(sample) {
     goertzel.processSample(sample);
   });
 
-  markFreq  = goertzel.energies[mark.toString()]
-  spaceFreq = goertzel.energies[space.toString()]
-  console.log(markFreq);
-  console.log(spaceFreq);
+  markFreq  = goertzel.energies[mStr].toFixed(markSig);
+  spaceFreq = goertzel.energies[sStr].toFixed(spaceSig);
+//  console.log(markFreq);
+//  console.log(spaceFreq);
+  
   if (markFreq > spaceFreq) {
-    console.log("MARK ==");
+    if (type != 2) {
+      type = 2;
+      count = 1;
+    } else
+      count++;
+    console.log("MARK  " + count);
     // is mark
   } else if (spaceFreq > markFreq) {
-    console.log("SPACE +++++++");
+    if (type != 1) {
+      type = 1;
+      count = 1;
+    } else
+      count++;
+    console.log("SPACE " + count);
     // is space
   } else {
-    // nothing??
+    type = 0;
+    // nothing
   }
-
-/*
-  const note = ft.nearestNote(hz)
-
-  // ignore frequencies too far from given octaves
-  if (note.percentage > 100 || note.percentage < -100) return
-
-  silence = 0
-*/
 
 })
 
