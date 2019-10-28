@@ -6,16 +6,16 @@ const Mic = require('mic');
 
 const ft = new FrequencyTable(3, 5);
 
-const rate = 48000;
+const rate = 41000;
 
-const mark = 400;
-const space = 600;
+const mark = 4400;
+const space = 5000;
 
 const mic = Mic({
-  rate,
+  rate: rate,
   channel: 1,
   bitwidth: 16,
-  encoding: 'signed-integer'
+  encoding: 'unsinged-integer'
 });
 
 const goertzel = new Goertzel({
@@ -31,21 +31,17 @@ stream.on('error', e => {
 });
 
 
-let silence = 0
+let count = 0;
 stream.on('data', b => {
   const hz = bufferToFreq(rate, b);
-
-  silence++;
-  if (silence >= 5) {
-  }
   console.log(hz);
 
   goertzel.refresh();
 
-  var buffer = b; // array of int samples
-  buffer.forEach(function(sample) {
+  const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
+
+  wf.forEach(function(sample) {
     goertzel.processSample(sample);
-    
   });
 
   markFreq  = goertzel.energies[mark.toString()]
