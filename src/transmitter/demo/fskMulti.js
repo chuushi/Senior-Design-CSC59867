@@ -1,6 +1,10 @@
 (function(){
 "use strict";
 
+// ===== CONFIG ===== //
+var freqs = [22000, 18000, 8000, 400];
+// ===== CONFIG ===== //
+
 var context, o, g;
 
 function run() {
@@ -22,9 +26,9 @@ function f(n) {
     return o.frequency;
 }
 
-var low = 880;
-var high = 440;
-var interval = 200;
+var high = 8000;
+var low = 9000;
+var interval = 500;
 
 var v = false;
 
@@ -52,10 +56,32 @@ function send(n) {
     setTimeout(send, interval, nn);
 }
 
-document.getElementById("instart").onclick = function() {
-    var n = document.getElementById("inval").value;
-    send(n);  
-}
+var domButtons = document.getElementById("buttons");
 
+var hit = -1;
+for (var i = 0; i < freqs.length; i++) {
+    var e = document.createElement("input");
+    e.setAttribute("type", "button");
+    e.value = "Play " + freqs[i];
+    e.dataset.index = i;
+    
+    e.onclick = function() {
+        var j = this.dataset.index;
+        if (hit == j) {
+            hit = -1;
+            stop();
+            v = false;
+            return;
+        }
+        if (!v) {
+            run();
+            v = true;
+        }
+        hit = j;
+        f(freqs[j]);
+    }
+    
+    domButtons.appendChild(e);    
+}
 
 }())
