@@ -4,7 +4,9 @@
   "description": "Senior Project for CSC 59867",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "demo": "echo \"Error: Demo not set up yet\" && exit 1",
+    "receiver": "node src/receiver/index.js",
+    "transmitter": "node src/transmitter/index.js",
   },
   "keywords": [
     "rc"
