@@ -6,7 +6,7 @@
   "scripts": {
     "demo": "echo \"Error: Demo not set up yet\" && exit 1",
     "receiver": "node src/receiver/index.js",
-    "transmitter": "node src/transmitter/index.js",
+    "transmitter": "node src/transmitter/index.js"
   },
   "keywords": [
     "rc"
