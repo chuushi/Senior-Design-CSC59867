@@ -2,7 +2,7 @@
 "use strict";
 
 // ===== CONFIG ===== //
-var freqs = [20500, 20200, 19900, 19500];
+var freqs = [20500, 20350, 20200, 20050];
 // ===== CONFIG ===== //
 
 var context, o, g;
