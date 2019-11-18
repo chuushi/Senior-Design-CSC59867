@@ -12,6 +12,7 @@
   "author": "team1",
   "license": "ISC",
   "dependencies": {
+    "detect-pitch": "^1.1.0",
     "goertzeljs": "^4.2.1",
     "mic": "^2.1.2"
   },

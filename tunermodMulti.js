@@ -2,8 +2,7 @@
 
 const Goertzel = require('goertzeljs');
 const Mic = require('mic');
-
-// const ft = new FrequencyTable(3, 5);
+const detectPitch = require('detect-pitch');
 
 // ===== CONFIGS ===== //
 const rate = 41000;
