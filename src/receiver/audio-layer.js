@@ -3,12 +3,11 @@ const Mic = require('mic');
 const detectPitch = require('detect-pitch');
 const Events = require('events');
 
-// ===== CONFIGS ===== //
-const rate = 41000;
-const freqs = [20500, 20350, 20200, 20050];
-const sigs = [5, 5, 5, 5];
-const showDebug = true;
-// ===== END CONFIGS ===== //
+const config = require('../../config.js'),
+    rate = config.rate,
+    freqs = config.freqs,
+    sigs = config.sigs,
+    showDebug = config.showDebug;
 
 function bufferToFreq (rate, b) {
   const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
