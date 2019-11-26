@@ -51,48 +51,46 @@ AudioLayer.prototype.start = function() {
     });
 
     this.stream.on('data', b => {
-      
-    this.goertzel.refresh();
-    
-    // Convert input buffer data into frequencies and process them in goertzel
-    const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
-    const _this = this;
-    wf.forEach(function(sample) {
-        _this.goertzel.processSample(sample);
-    });
+        this.goertzel.refresh();
+        
+        // Convert input buffer data into frequencies and process them in goertzel
+        const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
+        const _this = this;
+        wf.forEach(function(sample) {
+            _this.goertzel.processSample(sample);
+        });
 
-    // Get the energies, and prepare to find the highest index
-    var energies = [this.goertzel.energies[fStr[0]].toFixed(sigs[0])];
-    var highIndex = 0;
+        // Get the energies, and prepare to find the highest index
+        var energies = [this.goertzel.energies[fStr[0]].toFixed(sigs[0])];
+        var highIndex = 0;
 
-    for (var i = 1; i < freqs.length; i++) {
-        energies[i] = this.goertzel.energies[fStr[i]].toFixed(sigs[i]);
-        if (energies[highIndex] < energies[i])
-            highIndex = i;
-    }
+        for (var i = 1; i < freqs.length; i++) {
+            energies[i] = this.goertzel.energies[fStr[i]].toFixed(sigs[i]);
+            if (energies[highIndex] < energies[i])
+                highIndex = i;
+        }
 
-    // This means none of the frequencies exceeded the required threshold
-    if (energies[highIndex] == 0.0) {
-        index = -1;
+        // This means none of the frequencies exceeded the required threshold
+        if (energies[highIndex] == 0.0) {
+            index = -1;
+            if (showDebug)
+                console.log("NO DATA\t" + bufferToFreq(rate, b));
+            this.ev.emit('data', []);
+            return;
+        }
+
+          
+        if (index != highIndex)
+            count = 1;
+        else
+            count++;
+
+        index = highIndex;
         if (showDebug)
-            console.log("NO DATA\t" + bufferToFreq(rate, b));
-        this.ev.emit('data', []);
-        return;
-    }
+            console.log("Rx:\t" + freqs[index] + "\t" + count + "\t" + energies[index]);
+        this.ev.emit('data', [index]);
 
-      
-    if (index != highIndex)
-        count = 1;
-    else
-        count++;
-
-    index = highIndex;
-    if (showDebug)
-        console.log("Rx:\t" + freqs[index] + "\t" + count + "\t" + energies[index]);
-    this.ev.emit('data', [index]);
-
-    });
-    
+        });
     this.mic.start();
 }
 
