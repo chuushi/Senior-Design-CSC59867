@@ -5,12 +5,10 @@ const Events = require('events');
 
 // ===== CONFIGS ===== //
 const rate = 41000;
-const freqs = [20500, 20000, 19500, 19000];
+const freqs = [20500, 20350, 20200, 20050];
 const sigs = [5, 5, 5, 5];
 const showDebug = true;
 // ===== END CONFIGS ===== //
-
-class AudioEvent extends Events {}
 
 function bufferToFreq (rate, b) {
   const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
@@ -36,8 +34,7 @@ const AudioLayer = function() {
       fStr[i] = freqs[i].toString();
     }
     
-    this.event = new AudioEvent();
-    this.on = event.on;
+    this.ev = new Events.EventEmitter();
     this.stream;
     
     return this;
@@ -47,29 +44,30 @@ let count = 0;
     index = -1;
 
 AudioLayer.prototype.start = function() {
-    this.stream = mic.getAudioStream();
+    this.stream = this.mic.getAudioStream();
     
-    stream.on('error', e => {
+    this.stream.on('error', e => {
         console.error(e);
         process.exit(1);
     });
 
-    stream.on('data', b => {
+    this.stream.on('data', b => {
       
-    goertzel.refresh();
-
+    this.goertzel.refresh();
+    
     // Convert input buffer data into frequencies and process them in goertzel
     const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
+    const _this = this;
     wf.forEach(function(sample) {
-        goertzel.processSample(sample);
+        _this.goertzel.processSample(sample);
     });
 
     // Get the energies, and prepare to find the highest index
-    var energies = [goertzel.energies[fStr[0]].toFixed(sigs[0])];
+    var energies = [this.goertzel.energies[fStr[0]].toFixed(sigs[0])];
     var highIndex = 0;
 
     for (var i = 1; i < freqs.length; i++) {
-        energies[i] = goertzel.energies[fStr[i]].toFixed(sigs[i]);
+        energies[i] = this.goertzel.energies[fStr[i]].toFixed(sigs[i]);
         if (energies[highIndex] < energies[i])
             highIndex = i;
     }
@@ -79,7 +77,7 @@ AudioLayer.prototype.start = function() {
         index = -1;
         if (showDebug)
             console.log("NO DATA\t" + bufferToFreq(rate, b));
-        this.event.emit('data', []);
+        this.ev.emit('data', []);
         return;
     }
 
@@ -92,7 +90,7 @@ AudioLayer.prototype.start = function() {
     index = highIndex;
     if (showDebug)
         console.log("Rx:\t" + freqs[index] + "\t" + count + "\t" + energies[index]);
-    this.event.emit('data', [index]);
+    this.ev.emit('data', [index]);
 
     });
     

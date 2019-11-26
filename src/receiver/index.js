@@ -3,10 +3,11 @@ const Gpio = require('./gpio-layer.js');
 
 const a = new AudioLayer();
 
-a.on('data', d => {
+a.ev.on('data', d => {
     if (d.length == 0)
         return;
-    
+
+    console.log(d[0]);
     if (d[0] == 0)
         Gpio('none');
     else if (d[0] == 1)

@@ -7,7 +7,7 @@ const detectPitch = require('detect-pitch');
 // ===== CONFIGS ===== //
 const rate = 41000;
 const freqs = [20500, 20350, 20200, 20050];
-const sigs = [5, 5, 5, 5];
+const sigs = [6, 6, 6, 6];
 const showDebug = true;
 
 // ===== END CONFIGS ===== //
