@@ -1,20 +1,33 @@
 <!doctype html>
 <html>
-<head>
-	
-<link rel="stylesheet" href="./Controller.css">
-<meta charset="utf-8">
-	
-</head>
+  <head>
+    
+  <link rel="stylesheet" href="Controller.css">
+  <meta charset="utf-8">
+    
+  </head>
 <body>
 
-<h1>DEMO - Controller</h1>
-	
+  <h1>Controller</h1>
+    <table id="arrows">
+    <tr>
+      <th class="arrow" data-dir="forward-left">↖</th>
+      <th class="arrow" data-dir="forward">⬆</th>
+      <th class="arrow" data-dir="forward-right">↗</th>
+    </tr>
+    <tr>
+      <td class="arrow" data-dir="reverse-left">↙</td>
+      <td class="arrow" data-dir="reverse">⬇</td>
+      <td class="arrow" data-dir="reverse-right">↘</td>
+    </tr>
+  </table>
+  
+  <p>Clicking: <span id="debug"></span></p>
 
-	
-<!--<div class="controller" id="buttons"></div>-->
 
-<script src="fskController.js"></script>
-	
-</body>
+  <script src="config.js"></script>
+  <script src="sound-layer.js"></script>
+  <script src="fskController.js"></script>
+    
+  </body>
 </html>
