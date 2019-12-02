@@ -50,7 +50,7 @@ AudioLayer.prototype.start = function() {
         process.exit(1);
     });
 
-    this.stream.on('data', b => this.parseStream(b);
+    this.stream.on('data', b => this.parseStream(b));
     this.mic.start();
 }
 
