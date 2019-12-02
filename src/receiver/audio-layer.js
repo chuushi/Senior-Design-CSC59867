@@ -50,52 +50,62 @@ AudioLayer.prototype.start = function() {
         process.exit(1);
     });
 
-    this.stream.on('data', b => {
-        this.goertzel.refresh();
-        
-        // Convert input buffer data into frequencies and process them in goertzel
-        const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
-        const _this = this;
-        wf.forEach(function(sample) {
-            _this.goertzel.processSample(sample);
-        });
-
-        // Get the energies, and prepare to find the highest index
-        var energies = [this.goertzel.energies[fStr[0]].toFixed(sigs[0])];
-        var highIndex = 0;
-
-        for (var i = 1; i < freqs.length; i++) {
-            energies[i] = this.goertzel.energies[fStr[i]].toFixed(sigs[i]);
-            if (energies[highIndex] < energies[i])
-                highIndex = i;
-        }
-
-        // This means none of the frequencies exceeded the required threshold
-        if (energies[highIndex] == 0.0) {
-            index = -1;
-            if (showDebug)
-                console.log("NO DATA\t" + bufferToFreq(rate, b));
-            this.ev.emit('data', []);
-            return;
-        }
-
-          
-        if (index != highIndex)
-            count = 1;
-        else
-            count++;
-
-        index = highIndex;
-        if (showDebug)
-            console.log("Rx:\t" + freqs[index] + "\t" + count + "\t" + energies[index]);
-        this.ev.emit('data', [index]);
-
-        });
+    this.stream.on('data', this._parseStream);
     this.mic.start();
 }
 
 AudioLayer.prototype.stop = function() {
     this.mic.stop();
+}
+
+AudioLayer.prototype._parseStream = function(b) {
+    this.goertzel.refresh();
+    
+    // Convert input buffer data into frequencies and process them in goertzel
+    const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
+    const _this = this;
+    wf.forEach(function(sample) {
+        _this.goertzel.processSample(sample);
+    });
+
+    // Get energyData parsed
+    var energyData = [];
+    for (var i = 0; i < freqs.length; i++) {
+        energyData.push({
+            index: i,
+            freq: freqs[i],
+            energy: this.goertzel.energies[fStr[i]].toFixed(sigs[i])
+        });
+    }
+    
+    // Sort energyData
+    energyData.sort((a, b) => (a.energy > b.energy) ? -1 : 1);
+
+    // This means none of the frequencies exceeded the required threshold
+    if (energyData[0].energy == 0.0) {
+        index = -1;
+        if (showDebug)
+            console.log("NO DATA\t" + bufferToFreq(rate, b));
+    } else {
+        // remove all zero-energy data
+        energyData.forEach(function(d, i, o) {
+            if (d.energy == 0.0) {
+                o.splice(i, 1);
+            }
+        });
+        
+        var e0 = energyData[0];
+        
+        if (index != e0.index)
+            count = 1;
+        else
+            count++;
+
+        index = e0.index;
+        if (showDebug)
+            console.log("Rx:\t" + e0.freq + "\t" + count + "\t" + e0.energy);
+    }
+    this.ev.emit('data', energyData);
 }
 
 module.exports = AudioLayer;

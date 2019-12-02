@@ -13,17 +13,20 @@ a.ev.on('data', d => {
     }
     
     counter = 0;
-    if (d[0] == 0)
-        Gpio('none');
-    else if (d[0] == 1)
-        Gpio('left');
-    else if (d[0] == 2)
-        Gpio('right');
-    else if (d[0] == 3)
-        Gpio('forward');
-    else if (d[0] == 4)
-        Gpio('backward');
-    console.log(d[0]);
+    switch (d[0].index) {
+        case 1:
+            Gpio('forward');
+        case 2:
+            Gpio('backward');
+        case 3:
+            Gpio('left');
+        case 4:
+            Gpio('right');
+        case 0:
+        default:
+            Gpio('none');
+    }
+    console.log(d);
 });
 
 a.start();
