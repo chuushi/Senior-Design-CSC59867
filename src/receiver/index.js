@@ -16,12 +16,16 @@ a.ev.on('data', d => {
     switch (d[0].index) {
         case 1:
             Gpio('forward');
+            break;
         case 2:
             Gpio('backward');
+            break;
         case 3:
             Gpio('left');
+            break;
         case 4:
             Gpio('right');
+            break;
         case 0:
         default:
             Gpio('none');
