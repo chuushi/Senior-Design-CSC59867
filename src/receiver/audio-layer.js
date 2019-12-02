@@ -90,7 +90,7 @@ AudioLayer.prototype._parseStream = function(b) {
         return;
     }
     // remove all zero-energy data
-    for (var i = energyData.length - 1; i >= 0; edi--) {
+    for (var i = energyData.length - 1; i >= 0; i--) {
         if (energyData[i].energy == 0.0)
             energyData.splice(i, 1);
     }
