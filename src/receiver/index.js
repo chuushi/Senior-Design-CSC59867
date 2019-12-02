@@ -1,5 +1,6 @@
 const AudioLayer = require('./audio-layer.js');
 const Gpio = require('./gpio-layer.js');
+const debug = require('../../config.js').debug;
 
 const a = new AudioLayer();
 
@@ -16,21 +17,34 @@ a.ev.on('data', d => {
     switch (d[0].index) {
         case 1:
             Gpio('forward');
+            Gpio('straight');
             break;
         case 2:
-            Gpio('backward');
-            break;
-        case 3:
+            Gpio('forward');
             Gpio('left');
             break;
+        case 3:
+            Gpio('forward');
+            Gpio('right');
+            break;
         case 4:
+            Gpio('reverse');
+            Gpio('straight');
+            break;
+        case 5:
+            Gpio('reverse');
+            Gpio('right');
+            break;
+        case 6:
+            Gpio('reverse');
             Gpio('right');
             break;
         case 0:
         default:
             Gpio('none');
     }
-    console.log(d);
+    if (debug)
+        console.log(d);
 });
 
 a.start();

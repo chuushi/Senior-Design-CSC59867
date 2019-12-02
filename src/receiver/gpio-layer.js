@@ -25,12 +25,13 @@ const out = function out( direction ) {
         move.left.writeSync(0);
         move.right.writeSync(1);
             break;
+            
         case "forward":
         move.forward.writeSync(1);
         move.backward.writeSync(0);
             break;
 
-        case "backward":
+        case "reverse":
         move.forward.writeSync(0);
         move.backward.writeSync(1);
             break;
@@ -40,7 +41,7 @@ const out = function out( direction ) {
         move.backward.writeSync(0);
             break;
         
-        case "no-steer":
+        case "straight":
         move.left.writeSync(0);
         move.right.writeSync(0);
             break;
