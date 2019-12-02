@@ -50,7 +50,7 @@ AudioLayer.prototype.start = function() {
         process.exit(1);
     });
 
-    this.stream.on('data', this._parseStream);
+    this.stream.on('data', b => this.parseStream(b);
     this.mic.start();
 }
 
@@ -86,25 +86,25 @@ AudioLayer.prototype._parseStream = function(b) {
         index = -1;
         if (showDebug)
             console.log("NO DATA\t" + bufferToFreq(rate, b));
-    } else {
-        // remove all zero-energy data
-        energyData.forEach(function(d, i, o) {
-            if (d.energy == 0.0) {
-                o.splice(i, 1);
-            }
-        });
-        
-        var e0 = energyData[0];
-        
-        if (index != e0.index)
-            count = 1;
-        else
-            count++;
-
-        index = e0.index;
-        if (showDebug)
-            console.log("Rx:\t" + e0.freq + "\t" + count + "\t" + e0.energy);
+        this.ev.emit('data', []);
+        return;
     }
+    // remove all zero-energy data
+    for (var i = energyData.length - 1; i >= 0; edi--) {
+        if (energyData[i].energy == 0.0)
+            energyData.splice(i, 1);
+    }
+    
+    var e0 = energyData[0];
+    
+    if (index != e0.index)
+        count = 1;
+    else
+        count++;
+
+    index = e0.index;
+    if (showDebug)
+        console.log("Rx:\t" + e0.freq + "\t" + count + "\t" + e0.energy);
     this.ev.emit('data', energyData);
 }
 
