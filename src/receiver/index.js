@@ -33,7 +33,7 @@ a.ev.on('data', d => {
             break;
         case 5:
             Gpio('reverse');
-            Gpio('right');
+            Gpio('left');
             break;
         case 6:
             Gpio('reverse');
