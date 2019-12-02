@@ -3,11 +3,16 @@ const Gpio = require('./gpio-layer.js');
 
 const a = new AudioLayer();
 
-a.ev.on('data', d => {
-    if (d.length == 0)
-        return;
+let counter = 0;
 
-    console.log(d[0]);
+a.ev.on('data', d => {
+    if (d.length == 0) {
+        if (++counter > 4)
+            Gpio('none');
+        return;
+    }
+    
+    counter = 0;
     if (d[0] == 0)
         Gpio('none');
     else if (d[0] == 1)
@@ -18,7 +23,7 @@ a.ev.on('data', d => {
         Gpio('forward');
     else if (d[0] == 4)
         Gpio('backward');
-    
+    console.log(d[0]);
 });
 
 a.start();
