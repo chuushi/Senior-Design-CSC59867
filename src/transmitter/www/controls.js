@@ -97,9 +97,7 @@ function parseKey() {
 var activeBtn;
 
 function onDown(e) {
-    console.log(e.target);
     activeBtn = e.target;
-    console.log(activeBtn);
     dataHandler(activeBtn.dataset.dir);
     e.preventDefault();
 }

@@ -40,15 +40,6 @@ function f(n) {
     return o.frequency;
 }
 
-var high = 8000;
-var low = 9000;
-var interval = 500;
-
-var v = false;
-
-
-var domButtons = document.getElementById("buttons");
-
 window.soundLayer = function(dir) {
     if (dir == null)
         stop();

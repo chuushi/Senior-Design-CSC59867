@@ -1,0 +1,12 @@
+#arrows {
+  border-collapse: collapse;
+  font-size: 3em;
+  text-align: center;
+  font-weight: bold;
+}
+
+.arrow {
+  border: 1px solid black;
+  width: 3em;
+  height: 3em;
+}

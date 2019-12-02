@@ -1,6 +1,6 @@
 const AudioLayer = require('./audio-layer.js');
 const Gpio = require('./gpio-layer.js');
-const debug = require('../../config.js').debug;
+const debug = require('../../config.js').showDebug;
 
 const a = new AudioLayer();
 
