@@ -1,6 +1,9 @@
 const express = require('express');
 const config = require('../../config.js');
 
+console.log("CSC 59867 - Team 1");
+console.log("Transmitter - Remote Control Portion");
+
 // === Webserver Engine - sets up a webserver ===
 // exit on terminal by [Ctrl] + [C]
 
