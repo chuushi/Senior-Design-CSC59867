@@ -3,12 +3,14 @@ const Mic = require('mic');
 const detectPitch = require('detect-pitch');
 const Events = require('events');
 
+// load configurations
 const config = require('../../config.js'),
     rate = config.rate,
     freqs = config.freqs,
     sigs = config.sigs,
     showDebug = config.showDebug;
 
+// Simple function to get approximate dominant frequency from buffer
 function bufferToFreq (rate, b) {
   const wf = new Int16Array(b.buffer, b.byteOffset, b.byteLength / Int16Array.BYTES_PER_ELEMENT);
   return parseFloat((rate / detectPitch(wf, 0.2)).toFixed(2))
@@ -16,23 +18,28 @@ function bufferToFreq (rate, b) {
 
 var fStr = [];
 
+// the main class: AudioLayer Class
 const AudioLayer = function() {
+    // set up Mic
     this.mic = Mic({
-      rate: rate,
-      channel: 1,
-      bitwidth: 16,
-      encoding: 'unsinged-integer'
+        rate: rate,
+        channel: 1,
+        bitwidth: 16,
+        encoding: 'unsinged-integer'
     });
     
+    // set up Goertzel
     this.goertzel = new Goertzel({
-      frequencies: freqs,
-      sampleRate : rate
+        frequencies: freqs,
+        sampleRate : rate
     });
 
+    // Turn each frequency integers to string for parsing in Goertzel call later
     for (var i = 0; i < freqs.length; i++) {
       fStr[i] = freqs[i].toString();
     }
     
+    // set up Event
     this.ev = new Events.EventEmitter();
     this.stream;
     
@@ -42,6 +49,7 @@ const AudioLayer = function() {
 let count = 0;
     index = -1;
 
+// start member function: starts listening to and parsing the input audio from microphone
 AudioLayer.prototype.start = function() {
     this.stream = this.mic.getAudioStream();
     
@@ -54,10 +62,12 @@ AudioLayer.prototype.start = function() {
     this.mic.start();
 }
 
+// stop member function: stops the microphone from listening
 AudioLayer.prototype.stop = function() {
     this.mic.stop();
 }
 
+// parseStream private member function: parses data from microphone; called from start()
 AudioLayer.prototype._parseStream = function(b) {
     this.goertzel.refresh();
     
@@ -71,6 +81,7 @@ AudioLayer.prototype._parseStream = function(b) {
     // Get energyData parsed
     var energyData = [];
     for (var i = 0; i < freqs.length; i++) {
+        // create new entries for energyData
         energyData.push({
             index: i,
             freq: freqs[i],
@@ -97,6 +108,7 @@ AudioLayer.prototype._parseStream = function(b) {
     
     var e0 = energyData[0];
     
+    // count how many times the same frequency has been heard
     if (index != e0.index)
         count = 1;
     else

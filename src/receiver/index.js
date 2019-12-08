@@ -2,12 +2,19 @@ const AudioLayer = require('./audio-layer.js');
 const Gpio = require('./gpio-layer.js');
 const debug = require('../../config.js').showDebug;
 
+console.log("CSC 59867 - Team 1");
+console.log("Receiver - Vehicle Control Portion");
+
 const a = new AudioLayer();
 
 let counter = 0;
 
+// Set up event: when "data" event is fired...
 a.ev.on('data', d => {
+    // If there is no data (not enough power in each frequency)
     if (d.length == 0) {
+        // If there is no data for over four consective iterations,
+        //   then the vehicle will stop on its own.
         if (++counter > 4)
             Gpio('none');
         return;
@@ -47,4 +54,5 @@ a.ev.on('data', d => {
         console.log(d);
 });
 
+// Start listening to mic
 a.start();
