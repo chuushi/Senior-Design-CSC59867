@@ -1,29 +1,44 @@
 (function(){
 "use strict";
 
-var freqs = [20500, 20350, 20200, 20050];
-var btnTable = document.getElementById("arrows");
-
+// === dataHandler - run every time the vehicle direction changes ===
 function dataHandler(direction) {
-    if (direction == null)
-        window.soundLayer();
     window.soundLayer(direction);
     document.getElementById("debug").innerHTML = direction;
 }
 
-var btns = btnTable.getElementsByClassName("arrow");
+// === Attach click/touch events to all arrow control buttons ===
+var btns = document.getElementById("arrows").getElementsByClassName("arrow");
+var activeBtn;
 
 for (var i = 0; i < btns.length; i++) {
     btns[i].addEventListener("touchstart", onDown);
     btns[i].addEventListener("mousedown", onDown);
-    // todo:  implement touchmove maybe?
-    //btns[i].addEventListener("touchmove", onMove);
     btns[i].addEventListener("touchend", onUp);
     btns[i].addEventListener("touchcancel", onUp);
     btns[i].addEventListener("mouseup", onUp);
     btns[i].addEventListener("mouseout", onUp);
 }
 
+// Run on GUI button presses
+function onDown(e) {
+    activeBtn = e.target;
+    dataHandler(activeBtn.dataset.dir);
+    e.preventDefault();
+}
+
+// Run on GUI button releases
+function onUp(e) {
+    if (activeBtn != e.target)
+        return;
+    
+    dataHandler(null);
+    activeBtn = null;
+    e.preventDefault();
+}
+
+// === Attach keyboard events to up, down, left, and right keys ===
+// Keyboard toggle list: true if pressed, false if released
 var keys = {
     up: false,
     down: false,
@@ -31,6 +46,7 @@ var keys = {
     right: false
 };
 
+// Register physical key press events
 window.addEventListener("keydown", event => {
     switch (event.keyCode) {
     case 37: // left
@@ -51,6 +67,7 @@ window.addEventListener("keydown", event => {
     parseKey();
 });
 
+// Register physical key release events
 window.addEventListener("keyup", event => {
     switch (event.keyCode) {
     case 37: // left
@@ -71,6 +88,7 @@ window.addEventListener("keyup", event => {
     parseKey();
 });
 
+// Run proper handler for each key
 function parseKey() {
     if (keys.up == keys.down) {
         dataHandler(null);
@@ -94,52 +112,4 @@ function parseKey() {
     }
 }
 
-var activeBtn;
-
-function onDown(e) {
-    activeBtn = e.target;
-    dataHandler(activeBtn.dataset.dir);
-    e.preventDefault();
-}
-
-function onUp(e) {
-    if (activeBtn != e.target)
-        return;
-    
-    dataHandler(null);
-    activeBtn = null;
-    e.preventDefault();
-}
-
-/*
-function touchHandler(event, action) {
-    var touches = event.changedTouches,
-        first = touches[0],
-        type = "";
-    var x = touches[0].pageX,
-        y = touches[0].pageY;
-    switch(event.type) {
-        case "touchstart": type = "mousedown"; break;
-        case "touchmove":  type="mousemove"; break;        
-        case "touchend":   type="mouseup"; break;
-        default: return;
-    }
-}
-
-function init(elem, action) {
-    var element = document.getElementById(elem);
-    element.addEventListener("touchstart", function(event) {
-        touchHandler(event, action);
-    }, true);
-    element.addEventListener("touchmove", function(event) {
-        touchHandler(event, action);
-    }, true);
-    element.addEventListener("touchend", function(event) {
-        touchHandler(event, action);
-    }, true);
-    element.addEventListener("touchcancel", function(event) {
-        touchHandler(event, action);
-    }, true);  
-}
-*/
 }())
